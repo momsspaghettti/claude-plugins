@@ -1,0 +1,16 @@
+{
+  "name": "ivan-claude-plugins",
+  "owner": {
+    "name": "Ivan Samoilov"
+  },
+  "metadata": {
+    "description": "Specialized Claude Code plugins for backend development workflows"
+  },
+  "plugins": [
+    {
+      "name": "go-backend-dev",
+      "source": "./plugins/go-backend-dev",
+      "description": "Go backend feature development workflow with specialized agents for codebase exploration, architecture design, test strategy, and quality review"
+    }
+  ]
+}
