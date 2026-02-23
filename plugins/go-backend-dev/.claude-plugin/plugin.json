@@ -1,7 +1,7 @@
 {
   "name": "go-backend-dev",
   "version": "1.0.0",
-  "description": "Go backend feature development workflow with specialized agents for codebase exploration, architecture design, test strategy, and quality review — optimized for Go idioms, gopls, and Makefile-driven workflows",
+  "description": "Go backend development workflows for feature implementation and test writing — with specialized agents for codebase exploration, architecture design, test strategy, and quality review — optimized for Go idioms, gopls, and Makefile-driven workflows",
   "author": {
     "name": "Ivan Samoilov"
   },

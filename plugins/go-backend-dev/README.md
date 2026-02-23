@@ -1,10 +1,10 @@
 # Go Backend Development Plugin
 
-A structured workflow for developing features and fixing bugs in Go backend services. Optimized for Go idioms, gopls semantic navigation, and Makefile-driven workflows.
+A structured workflow for developing features and writing tests in Go backend services. Optimized for Go idioms, gopls semantic navigation, and Makefile-driven workflows.
 
 ## Overview
 
-This plugin provides an 8-phase approach to building features in Go backend services. Instead of jumping straight into code, it guides you through understanding the codebase (with gopls), asking clarifying questions, designing Go-idiomatic architecture, planning tests, and ensuring quality — resulting in well-designed features that follow Go best practices.
+This plugin provides structured workflows for Go backend development. The **feature** workflow guides you through an 8-phase approach to building features: understanding the codebase (with gopls), asking clarifying questions, designing Go-idiomatic architecture, planning tests, and ensuring quality. The **tests** workflow focuses specifically on writing and updating tests for existing or changed code with the same rigor — codebase exploration, test strategy design, implementation, and quality review.
 
 ## Philosophy
 
@@ -17,21 +17,29 @@ Go backend development requires specific expertise:
 
 This plugin embeds these practices into a structured workflow.
 
-## Command: `/go-backend-dev:feature`
+## Commands
 
-Launches the guided 8-phase workflow.
+### `/go-backend-dev:feature`
+
+Launches the guided 8-phase feature development workflow.
 
 **Usage:**
 ```bash
 /go-backend-dev:feature Add rate limiting middleware
 ```
 
-Or simply:
+### `/go-backend-dev:tests`
+
+Launches the guided test writing workflow — explores codebase, designs test strategy, implements tests with quality review.
+
+**Usage:**
 ```bash
-/go-backend-dev:feature
+/go-backend-dev:tests Write tests for my changes
+/go-backend-dev:tests Add tests for UserService
+/go-backend-dev:tests Improve test coverage for auth package
 ```
 
-## The 8-Phase Workflow
+## The Feature Workflow (8 Phases)
 
 ### Phase 1: Discovery
 Understand what needs to be built. Clarify the feature request, identify constraints.
@@ -73,6 +81,38 @@ Presents findings, **waits for user decision** (fix now / fix later / proceed).
 
 ### Phase 8: Summary
 Documents what was built: packages, interfaces, Makefile changes, test coverage, next steps.
+
+## The Tests Workflow (8 Phases)
+
+### Phase 1: Discovery
+Understand what code needs tests — recent changes, specific packages, or existing code lacking coverage.
+
+### Phase 2: Codebase Exploration (Go-Specialized)
+- Reads `go.mod` and `Makefile` for project context
+- Launches `go-explorer` agents to understand the code under test, existing test patterns, and affected tests
+- Maps what's already covered and what's missing
+
+### Phase 3: Clarifying Questions
+Resolves test scope ambiguities: mock boundaries, coverage expectations, edge cases, integration test needs.
+
+### Phase 4: Test Design (Go-Specialized)
+- Launches `go-test-designer` agents
+- Plans new unit tests, integration tests, mock changes, and existing test updates
+- **Waits for user approval**
+
+### Phase 5: User Approval
+Presents the complete test plan. **Requires explicit approval before implementation.**
+
+### Phase 6: Implementation
+- Writes new tests and updates existing ones following the approved plan
+- Runs `make lint` and targeted tests during implementation
+- Applies Go test conventions throughout
+
+### Phase 7: Quality Review (Go-Specialized)
+Launches `go-reviewer` agents checking test correctness, coverage completeness, and Go test idioms.
+
+### Phase 8: Summary
+Documents tests written, files created/modified, test commands to run.
 
 ## Agents
 
@@ -116,11 +156,17 @@ All agents use Context7 MCP tools to look up latest documentation for external l
 
 ## When to Use
 
-**Use for:**
+**Use `/go-backend-dev:feature` for:**
 - New Go backend features (endpoints, services, middleware)
 - Complex bug fixes requiring architectural understanding
 - Features touching multiple packages
 - Adding new integrations or data access layers
+
+**Use `/go-backend-dev:tests` for:**
+- Writing tests for recent code changes
+- Adding test coverage to existing packages
+- Updating tests after refactoring
+- Improving test quality and coverage
 
 **Don't use for:**
 - Single-line bug fixes
