@@ -173,7 +173,8 @@ func (s *UserServiceSuite) TearDownSuite() { /* DB cleanup */ }
 func (s *UserServiceSuite) TestCreateUser() {
     user, err := s.service.Create(ctx, input)
     s.Require().NoError(err)
-    s.Require().Equal("test@example.com", user.Email)
+    expected := &User{ID: 1, Email: "test@example.com", Name: "Test User"}
+    s.Require().Equal(expected, user)
 }
 func TestUserServiceSuite(t *testing.T) { suite.Run(t, new(UserServiceSuite)) }
 ```
@@ -187,6 +188,7 @@ func TestUserServiceSuite(t *testing.T) { suite.Run(t, new(UserServiceSuite)) }
 - **testcontainers** for integration tests with real databases
 - **Benchmarks** with `testing.B` for performance-critical code
 - **Fuzzing** with `testing.F` for input validation
+- **Compare whole objects** — pre-build the expected struct and assert with `require.Equal(t, expected, actual)` instead of comparing field by field
 - **Always run with `-race`** in CI
 
 ## Makefile Conventions

@@ -93,6 +93,7 @@ When code changes affect existing types, interfaces, or behavior:
 8. **Use `-race` flag** — ensure tests pass with race detector
 9. **Use `httptest`** for HTTP handler testing
 10. **Use `bufconn`** for gRPC testing without network
+11. **Compare whole objects** — build the full expected object and use `require.Equal` to compare actual vs expected in one assertion; avoid field-by-field comparisons
 
 ## Output Guidance
 

@@ -129,6 +129,7 @@ If the user says "whatever you think is best", provide your recommendation and g
    - Use `s.Require()` in TestSuite-based tests
    - Name test cases descriptively
    - Cover happy paths, edge cases, and all error paths
+   - Compare whole objects: build expected structs and use `require.Equal` for full comparison, avoid field-by-field assertions
    - Generate mocks if needed (following codebase mock generation approach)
 3. Update existing tests as specified in the plan:
    - Fix broken assertions

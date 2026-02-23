@@ -141,6 +141,7 @@ If the user says "whatever you think is best", provide your recommendation and g
    - Follow the test strategy from Phase 5
    - Use table-driven tests with `map[string]struct{...}`
    - Use `require` not `assert`
+   - Compare whole objects — build expected structs and use `require.Equal`, avoid field-by-field
    - Update existing tests affected by changes
 5. Run `make lint` during implementation to catch issues early
 6. Run targeted tests (`go test ./internal/package/...`) to verify correctness
