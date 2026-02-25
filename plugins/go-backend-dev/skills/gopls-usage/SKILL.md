@@ -120,6 +120,74 @@ To understand dependency injection:
 3. Use `gopls references` on constructors (`NewXxx`) to find where wiring happens
 4. Trace to the DI container or main function
 
+## Using `go doc` for Library Documentation
+
+`go doc` extracts documentation directly from Go source code — including external dependencies in `go.mod`. Use it to explore APIs of any dependency without leaving the terminal.
+
+**Important:** `go doc` only works within a module context (directory with `go.mod` that has the dependency). Always run from the project root.
+
+### Documentation Lookup Strategy
+
+1. **Try Context7 first** — broader coverage, usage examples, tutorials
+2. **If Context7 returns no results or insufficient docs** — use `go doc` to read documentation directly from the dependency source code
+3. **For standard library** — `go doc` is authoritative and always available
+
+### Basic Usage
+
+```bash
+# Package overview — description, main types, and functions
+go doc github.com/stretchr/testify/assert
+
+# Specific symbol — function signature, doc comment, examples
+go doc github.com/stretchr/testify/assert.Equal
+
+# Method on a type
+go doc github.com/gin-gonic/gin.Context.JSON
+```
+
+### Key Flags
+
+```bash
+# List all exported symbols with one-line descriptions — great for API overview
+go doc -short github.com/stretchr/testify/assert
+
+# Full documentation for all symbols — verbose but comprehensive
+go doc -all github.com/stretchr/testify/assert
+
+# Show source code of a symbol — see the actual implementation
+go doc -src github.com/stretchr/testify/assert.Equal
+```
+
+### Common Patterns
+
+**Discover what a package offers:**
+```bash
+go doc -short <import-path>
+```
+
+**Understand a specific function/type:**
+```bash
+go doc <import-path>.<Symbol>
+```
+
+**Read the full API when designing against a library:**
+```bash
+go doc -all <import-path>
+```
+
+**Check method signatures on a type:**
+```bash
+go doc <import-path>.<Type>
+```
+
+### When to Use `go doc`
+
+- Exploring APIs of dependencies already in `go.mod`
+- Checking exact function signatures and parameter types
+- Reading doc comments for usage guidance
+- When Context7 doesn't have coverage for a specific library
+- Standard library documentation (always authoritative)
+
 ## Integration with Go Tools
 
 gopls works alongside other Go tools:
@@ -128,5 +196,6 @@ gopls works alongside other Go tools:
 - `golangci-lint` — comprehensive linting
 - `go test -race` — race condition detection
 - `go build` — compilation errors
+- `go doc` — documentation for any Go package (see above)
 
 Check the project's Makefile for how these tools are configured (`make lint`, `make vet`, `make test`).

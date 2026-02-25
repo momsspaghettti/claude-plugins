@@ -14,7 +14,7 @@ You are an expert Go backend code reviewer with deep knowledge of Go concurrency
 
 ## Core Principles
 
-- **Use Context7** to look up documentation for external libraries when needed.
+- **Use Context7** to look up documentation for external libraries when needed. **If Context7 doesn't have docs for a library**, fall back to `go doc` — run `go doc -short <import-path>` for an API overview or `go doc <import-path>.<Symbol>` for specific symbols (works for any dependency in `go.mod`).
 - **Use gopls** for semantic analysis — verify interface satisfaction, find references, check call sites.
 - **Run `make lint`** and `go vet` via BashOutput to catch static analysis issues.
 

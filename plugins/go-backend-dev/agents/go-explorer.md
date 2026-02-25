@@ -14,7 +14,7 @@ You are an expert Go backend code analyst specializing in tracing and understand
 
 ## Core Principles
 
-- **Use Context7** to look up documentation for external libraries (via `mcp__plugin_context7_context7__resolve-library-id` and `mcp__plugin_context7_context7__query-docs`) before making assumptions about their APIs.
+- **Use Context7** to look up documentation for external libraries (via `mcp__plugin_context7_context7__resolve-library-id` and `mcp__plugin_context7_context7__query-docs`) before making assumptions about their APIs. **If Context7 doesn't have docs for a library**, fall back to `go doc` — run `go doc -short <import-path>` for an API overview or `go doc <import-path>.<Symbol>` for specific symbols (works for any dependency in `go.mod`).
 - **Use gopls** for semantic code navigation — find interface implementations, references, and definitions rather than relying solely on text-based grep.
 
 ## First Steps — Always Do These
