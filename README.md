@@ -20,6 +20,21 @@ Structured workflows for developing features and writing tests in Go backend ser
 - Test strategy planning (table tests, TestSuite, mock boundaries)
 - Makefile-aware build system integration
 
+### [gitlab-mr-review](plugins/gitlab-mr-review/)
+
+Iterative, multi-agent review of GitLab Merge Requests. Produces a structured report with copy-paste-ready inline findings, detects regressions across runs, and integrates Jira/Slack MCPs when available. Requires `glab` CLI.
+
+**Commands:**
+- `/gitlab-mr-review:review <MR-URL>` — full multi-agent review with copy-paste-ready findings
+
+**Features:**
+- 9 specialized agents (preflight, context gatherer, 5 review focuses, validator, report composer)
+- Read-only by design — no posting, no thread resolution
+- Iterative: recognizes its own prior findings via hidden footer signature; flags regressions
+- Optional Jira MCP integration for requirements extraction
+- Optional Slack MCP integration for context harvesting
+- Works on any self-hosted GitLab instance
+
 ## Installation
 
 Install plugins from this repository via Claude Code:

@@ -45,3 +45,4 @@ claude --plugin-dir ./plugins/<plugin-name>
 ## Current Plugins
 
 - **go-backend-dev** — Go backend development workflows with gopls integration, 4 specialized agents (explorer, architect, reviewer, test-designer), and 3 skills (gopls-usage, go-expertise, go-review). Entry points: `/go-backend-dev:feature <description>` for feature development, `/go-backend-dev:tests <what to test>` for test writing.
+- **gitlab-mr-review** — Iterative, multi-agent review of GitLab Merge Requests. Entry point: `/gitlab-mr-review:review <MR-URL>`. Reads MR context (diff, commits, threads, Jira, Slack, CLAUDE.md), runs 5 parallel review focuses (bugs, security, architecture, conventions, regression), dedupes against existing MR threads via fid footer signature, and emits a 5-section report with copy-paste-ready inline findings. Read-only by design. Requires `glab` CLI.
