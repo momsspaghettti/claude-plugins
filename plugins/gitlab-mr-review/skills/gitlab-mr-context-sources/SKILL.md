@@ -104,7 +104,7 @@ user_hint: "<raw text after URL in command, if any>"
 
 ### 1. MR metadata and description
 
-Invoke `GITLAB_HOST=<host> glab mr view <iid> -R <project> --output json`. Parse the JSON object and populate:
+Invoke `GITLAB_HOST=<host> glab mr view <iid> --repo <project> --output json`. Parse the JSON object and populate:
 
 - `mr.url` from `.web_url`
 - `mr.host` from URL parsing (not from the JSON — derive from the input URL)
@@ -122,7 +122,7 @@ Extract linked references (`!<iid>`, `#<id>`) from the description for source 8.
 
 ### 2. Unified diff
 
-Invoke `GITLAB_HOST=<host> glab mr diff <iid> -R <project> --raw`. The output is a standard unified diff across all changed files. Parse `diff --git a/<path> b/<path>` headers to enumerate changed file paths — these drive `intent.affected_areas` and CLAUDE.md discovery (source 7). Store the full raw diff string for passing to reviewer agents. Count lines added (`+` prefix) and removed (`-` prefix, excluding `---` headers) to populate the "Files: N changed (+X -Y)" summary in the context print.
+Invoke `GITLAB_HOST=<host> glab mr diff <iid> --repo <project> --raw`. The output is a standard unified diff across all changed files. Parse `diff --git a/<path> b/<path>` headers to enumerate changed file paths — these drive `intent.affected_areas` and CLAUDE.md discovery (source 7). Store the full raw diff string for passing to reviewer agents. Count lines added (`+` prefix) and removed (`-` prefix, excluding `---` headers) to populate the "Files: N changed (+X -Y)" summary in the context print.
 
 ### 3. Commits
 
@@ -135,7 +135,7 @@ Store commit SHAs, author names, and timestamps for use in language detection sa
 
 ### 4. Existing threads
 
-Invoke `GITLAB_HOST=<host> glab mr note list <iid> -R <project> --output json --state all`. For each discussion object in the returned array:
+Invoke `GITLAB_HOST=<host> glab mr note list <iid> --repo <project> --output json --state all`. For each discussion object in the returned array:
 
 - Map to `sources.existing_threads.by_thread[]` with: `id`, `file` (from `notes[0].position.new_path` if inline, else null), `line` (from `notes[0].position.new_line`), `status` (`"resolved"` if `notes[0].resolved == true`, else `"unresolved"`), and `notes` array with `author`, `body`, `created_at` from each note.
 - Scan `notes[0].body` for the footer pattern `<!-- gitlab-mr-review:v1 fid=<fid> run=<run> -->` using regex. If found, parse and populate `claude_footer: { fid, run }`.

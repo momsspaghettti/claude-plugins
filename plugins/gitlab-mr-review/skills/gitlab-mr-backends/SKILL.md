@@ -7,7 +7,7 @@ description: Backend selection and MCP detection patterns for the gitlab-mr-revi
 
 ## GitLab — glab only
 
-`glab` is the sole backend for all GitLab operations. The host is extracted from the MR URL at review time — `gitlab.com` is never hardcoded. All invocations follow the canonical form: `GITLAB_HOST=<host> glab <subcommand> -R <project> ...` so that the target instance and project are always explicit, independent of the current working directory's git remote.
+`glab` is the sole backend for all GitLab operations. The host is extracted from the MR URL at review time — `gitlab.com` is never hardcoded. All invocations follow the canonical form: `GITLAB_HOST=<host> glab <subcommand> --repo <project> ...` so that the target instance and project are always explicit, independent of the current working directory's git remote.
 
 GitLab MCP tools (tools matching `mcp__*gitlab*__*`) are ignored by default. An opt-in escape hatch `--gitlab-backend=mcp` is recognized but currently unsupported — if it is passed, the plugin must fail fast with a clear error message directing the user back to the glab-based flow.
 

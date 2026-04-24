@@ -39,7 +39,7 @@ Run `command -v glab` via Bash. If missing, return
 
 Run `glab auth status 2>&1`. Parse output for the specific host extracted above.
 If not authenticated for that host, return
-`{ status: "error", error: "glab_unauthenticated", message: "Not authenticated on <host>. Run: glab auth login -h <host>" }`.
+`{ status: "error", error: "glab_unauthenticated", message: "Not authenticated on <host>. Run: glab auth login --hostname <host>" }`.
 
 If `--gitlab-backend=mcp` was passed, return
 `{ status: "error", error: "backend_unsupported", message: "--gitlab-backend=mcp is not yet implemented. Use glab (default)." }`.
