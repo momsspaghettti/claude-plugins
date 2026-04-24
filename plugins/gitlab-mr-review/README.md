@@ -9,7 +9,7 @@ Claude Code's built-in `/code-review` covers GitHub but not GitLab (see upstream
 ## Prerequisites
 
 - `glab` CLI v1.92.1 or newer: https://docs.gitlab.com/cli/
-- `glab` authenticated for the target host: `glab auth login -h <host>`
+- `glab` authenticated for the target host: `glab auth login --hostname <host>`
 - Optional: any Jira MCP server for `[A-Z]{2,}-\d+` ticket enrichment
 - Optional: any Slack MCP server for thread-link enrichment
 
@@ -118,7 +118,7 @@ When the file is absent, the plugin applies sensible defaults (go-reviewer for `
 Install from https://docs.gitlab.com/cli/ and verify with `glab --version`.
 
 ### `glab` unauthenticated for a host
-Run `glab auth login -h <host>` where `<host>` matches the MR URL.
+Run `glab auth login --hostname <host>` where `<host>` matches the MR URL.
 
 ### Very large diff (>2000 lines or >100 files)
 The plugin prompts; you can narrow with `--focus=<path>` (if implemented) or proceed anyway.

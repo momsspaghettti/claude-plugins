@@ -47,7 +47,7 @@ Placeholders you will see throughout:
 | `<sha>`       | Commit SHA                                                        |
 
 Golden rule for CLI calls: every glab command that targets a project must
-carry both `-R <project>` (or full URL) AND a host hint
+carry both `--repo <project>` (or full URL) AND a host hint
 (`GITLAB_HOST=<host>` or `--hostname <host>` where supported).
 Do not rely on the current working directory unless the caller has explicitly
 verified that the CWD git remote matches the MR's project.
@@ -114,7 +114,7 @@ fi
   host string; glab accepts `host:port` in `GITLAB_HOST` and `--hostname`.
 - **URL encoding**: in URLs in the wild, `<project>` has raw slashes. When
   passing to the GitLab REST API (section 12), you must URL-encode to
-  `<project-enc>` (`/` → `%2F`). glab's own `-R` flag accepts the raw form.
+  `<project-enc>` (`/` → `%2F`). glab's own `--repo` flag accepts the raw form.
 - **Case**: hostnames are case-insensitive, project paths are case-sensitive
   on most GitLab instances. Lowercase the host; preserve project path verbatim.
 
@@ -142,15 +142,15 @@ selects the corresponding stored token.
 
 ### Recommended pattern — one-off command against a non-default host
 
-Always export `GITLAB_HOST` for the subshell, and pass `-R <project>` so glab
+Always export `GITLAB_HOST` for the subshell, and pass `--repo <project>` so glab
 does not try to infer project from CWD:
 
 ```bash
-GITLAB_HOST=<host> glab mr view <iid> -R <project> --output json
+GITLAB_HOST=<host> glab mr view <iid> --repo <project> --output json
 ```
 
 This works for every `glab mr …`, `glab ci …`, `glab issue …` invocation.
-The pair `GITLAB_HOST` + `-R <project>` is the canonical form for this plugin.
+The pair `GITLAB_HOST` + `--repo <project>` is the canonical form for this plugin.
 
 ### For `glab api` (REST / GraphQL)
 
@@ -176,7 +176,7 @@ unset them unless the caller specifically wants to inject a token.
 ```bash
 # Show token and host currently configured (per-host)
 glab config get host
-glab config get -h <host> token   # --host, per-host override
+glab config get --host <host> token   # per-host override
 ```
 
 ### Gotchas
@@ -185,11 +185,11 @@ glab config get -h <host> token   # --host, per-host override
   `https://gitlab.example.org`. Protocol is derived from the stored per-host
   `api_protocol` (default `https`).
 - A CWD with a GitLab git remote will override `GITLAB_HOST` for some
-  commands if `-R` is not provided. **Always pass `-R <project>` for this
+  commands if `--repo` is not provided. **Always pass `--repo <project>` for this
   plugin** to make the target explicit.
-- `--repo`/`-R` accepts `OWNER/REPO`, `GROUP/NAMESPACE/REPO`, full URL, or
+- `--repo` accepts `OWNER/REPO`, `GROUP/NAMESPACE/REPO`, full URL, or
   Git URL. Full HTTPS URLs are the safest unambiguous form:
-  `-R https://<host>/<project>.git` or simply the project path string.
+  `--repo https://<host>/<project>.git` or simply the project path string.
 
 ---
 
@@ -289,7 +289,7 @@ Exit 0 means the token can read the project.
 Primary command:
 
 ```bash
-GITLAB_HOST=<host> glab mr view <iid> -R <project> --output json
+GITLAB_HOST=<host> glab mr view <iid> --repo <project> --output json
 ```
 
 `glab mr view` flags of interest:
@@ -356,23 +356,23 @@ Draft detection (see section 13 for detail):
 
 ```bash
 # Title + state + draft flag
-glab mr view <iid> -R <project> --output json \
+glab mr view <iid> --repo <project> --output json \
   | jq -r '[.iid, .state, (.draft|tostring), .title] | @tsv'
 
 # Is this a draft?
-glab mr view <iid> -R <project> --output json | jq -r '.draft'
+glab mr view <iid> --repo <project> --output json | jq -r '.draft'
 
 # Labels, comma-joined
-glab mr view <iid> -R <project> --output json | jq -r '.labels | join(",")'
+glab mr view <iid> --repo <project> --output json | jq -r '.labels | join(",")'
 
 # Source/target branches
-glab mr view <iid> -R <project> --output json | jq -r '.source_branch + " -> " + .target_branch'
+glab mr view <iid> --repo <project> --output json | jq -r '.source_branch + " -> " + .target_branch'
 
 # Reviewer usernames
-glab mr view <iid> -R <project> --output json | jq -r '.reviewers[].username'
+glab mr view <iid> --repo <project> --output json | jq -r '.reviewers[].username'
 
 # Approval status at a glance (approvals list: see section 11)
-glab mr view <iid> -R <project> --output json | jq '.blocking_discussions_resolved, .detailed_merge_status'
+glab mr view <iid> --repo <project> --output json | jq '.blocking_discussions_resolved, .detailed_merge_status'
 ```
 
 ### Gotchas
@@ -395,14 +395,14 @@ no separate "get body" command. Prefer extracting from `glab mr view --output js
 to avoid HTML rendering or ANSI color artifacts from the text view.
 
 ```bash
-GITLAB_HOST=<host> glab mr view <iid> -R <project> --output json \
+GITLAB_HOST=<host> glab mr view <iid> --repo <project> --output json \
   | jq -r '.description'
 ```
 
 Human-readable variant (rendered markdown with Glamour):
 
 ```bash
-GITLAB_HOST=<host> glab mr view <iid> -R <project>
+GITLAB_HOST=<host> glab mr view <iid> --repo <project>
 ```
 
 The description can contain:
@@ -421,7 +421,7 @@ The description can contain:
 ### Extracting references with jq + regex
 
 ```bash
-glab mr view <iid> -R <project> --output json \
+glab mr view <iid> --repo <project> --output json \
   | jq -r '.description' \
   | grep -oE '([A-Za-z0-9_/.-]+)?[!#][0-9]+' \
   | sort -u
@@ -433,7 +433,7 @@ For the subset of references GitLab considers "related issues" (including
 `Closes` autolinks), use:
 
 ```bash
-GITLAB_HOST=<host> glab mr issues <iid> -R <project>
+GITLAB_HOST=<host> glab mr issues <iid> --repo <project>
 ```
 
 This command does not support `--output json`. If JSON is required, fall
@@ -457,7 +457,7 @@ Returns an array of issue objects (same shape as `GET /projects/:id/issues/:iid`
 ## 6. Fetching the Unified Diff
 
 ```bash
-GITLAB_HOST=<host> glab mr diff <iid> -R <project> --raw
+GITLAB_HOST=<host> glab mr diff <iid> --repo <project> --raw
 ```
 
 `glab mr diff` flags:
@@ -603,7 +603,7 @@ Threads on an MR come in three kinds:
 ### Primary (experimental but supported) command
 
 ```bash
-GITLAB_HOST=<host> glab mr note list <iid> -R <project> --output json
+GITLAB_HOST=<host> glab mr note list <iid> --repo <project> --output json
 ```
 
 `glab mr note list` flags:
@@ -711,7 +711,7 @@ JSON array.
 ### Alternative — `glab mr view --comments`
 
 ```bash
-GITLAB_HOST=<host> glab mr view <iid> -R <project> --comments
+GITLAB_HOST=<host> glab mr view <iid> --repo <project> --comments
 ```
 
 Text-only, human-readable, no JSON mode. Prefer `glab mr note list` or the
@@ -721,7 +721,7 @@ REST fallback for programmatic access.
 
 ```bash
 # All open (unresolved) inline threads: file, line, body, author
-glab mr note list <iid> -R <project> --output json \
+glab mr note list <iid> --repo <project> --output json \
   | jq -r '
       .[] | .notes[0]
       | select(.type == "DiffNote" and .resolved == false)
@@ -729,7 +729,7 @@ glab mr note list <iid> -R <project> --output json \
       | @tsv'
 
 # Count threads by kind
-glab mr note list <iid> -R <project> --output json \
+glab mr note list <iid> --repo <project> --output json \
   | jq '{
       inline:   [.[] | select(.notes[0].type == "DiffNote")]         | length,
       general:  [.[] | select(.notes[0].type != "DiffNote" and (.notes[0].system|not))] | length,
@@ -737,11 +737,11 @@ glab mr note list <iid> -R <project> --output json \
     }'
 
 # Unresolved threads only
-glab mr note list <iid> -R <project> --output json --state unresolved \
+glab mr note list <iid> --repo <project> --output json --state unresolved \
   | jq '.[] | {id, opener: .notes[0].body, file: .notes[0].position.new_path}'
 
 # Walk a thread: parent + all replies
-glab mr note list <iid> -R <project> --output json \
+glab mr note list <iid> --repo <project> --output json \
   | jq -r '.[] | "--- \(.id) ---", (.notes[] | "  @\(.author.username): \(.body)")'
 ```
 
@@ -764,23 +764,23 @@ glab exposes this filter on `glab mr note list` via `--state`:
 
 ```bash
 # Unresolved only
-GITLAB_HOST=<host> glab mr note list <iid> -R <project> \
+GITLAB_HOST=<host> glab mr note list <iid> --repo <project> \
   --output json --state unresolved
 
 # Resolved only
-GITLAB_HOST=<host> glab mr note list <iid> -R <project> \
+GITLAB_HOST=<host> glab mr note list <iid> --repo <project> \
   --output json --state resolved
 
 # Everything (default)
-GITLAB_HOST=<host> glab mr note list <iid> -R <project> \
+GITLAB_HOST=<host> glab mr note list <iid> --repo <project> \
   --output json --state all
 ```
 
 `glab mr view` has an equivalent pair of flags that imply `--comments`:
 
 ```bash
-glab mr view <iid> -R <project> --unresolved
-glab mr view <iid> -R <project> --resolved
+glab mr view <iid> --repo <project> --unresolved
+glab mr view <iid> --repo <project> --resolved
 ```
 
 These are text-only (no JSON). Prefer `glab mr note list` for scripts.
@@ -799,7 +799,7 @@ These are text-only (no JSON). Prefer `glab mr note list` for scripts.
 ### jq-only partition (if you need both in one pass)
 
 ```bash
-glab mr note list <iid> -R <project> --output json \
+glab mr note list <iid> --repo <project> --output json \
   | jq '{
       unresolved: [.[] | select(.notes[0].resolvable == true and .notes[0].resolved == false)],
       resolved:   [.[] | select(.notes[0].resolvable == true and .notes[0].resolved == true)],
@@ -825,7 +825,7 @@ Three entry points, from fastest/coarsest to richest:
 `glab mr view --output json` already contains `.head_pipeline`:
 
 ```bash
-glab mr view <iid> -R <project> --output json \
+glab mr view <iid> --repo <project> --output json \
   | jq '.head_pipeline | {id, status, sha, ref, web_url, created_at, updated_at}'
 ```
 
@@ -835,7 +835,7 @@ glab mr view <iid> -R <project> --output json \
 ### 10.2 `glab ci status` for the source branch
 
 ```bash
-GITLAB_HOST=<host> glab ci status -R <project> \
+GITLAB_HOST=<host> glab ci status --repo <project> \
   --branch <source_branch> --output json
 ```
 
@@ -873,7 +873,7 @@ Output is an array of job objects for the latest pipeline on that branch:
 ### 10.3 `glab ci get` — single pipeline JSON
 
 ```bash
-GITLAB_HOST=<host> glab ci get -R <project> \
+GITLAB_HOST=<host> glab ci get --repo <project> \
   --pipeline-id <pipeline-id> --output json --with-job-details
 ```
 
@@ -883,12 +883,12 @@ Returns a pipeline object with embedded jobs when `-d/--with-job-details` is set
 
 ```bash
 # Job names + statuses for the MR's head pipeline
-pipeline_id=$(glab mr view <iid> -R <project> --output json | jq -r '.head_pipeline.id')
-glab ci get -R <project> -p "$pipeline_id" --output json -d \
+pipeline_id=$(glab mr view <iid> --repo <project> --output json | jq -r '.head_pipeline.id')
+glab ci get --repo <project> --pipeline-id "$pipeline_id" --output json --with-job-details \
   | jq -r '.jobs[] | [.stage, .name, .status] | @tsv'
 
 # Failed jobs only
-glab ci status -R <project> --branch <source_branch> --output json \
+glab ci status --repo <project> --branch <source_branch> --output json \
   | jq '.[] | select(.status == "failed") | {name, stage, web_url}'
 ```
 
@@ -918,7 +918,7 @@ Two shapes of information:
 ### 11.1 Eligible approvers (who *can* approve)
 
 ```bash
-GITLAB_HOST=<host> glab mr approvers <iid> -R <project> --output json
+GITLAB_HOST=<host> glab mr approvers <iid> --repo <project> --output json
 ```
 
 Returns the approval rules and eligible users. Exact shape depends on the
@@ -1001,14 +1001,14 @@ inside GitLab based on context:
 ### Fetch another MR's brief metadata
 
 ```bash
-GITLAB_HOST=<host> glab mr view <iid> -R <other-project> --output json \
+GITLAB_HOST=<host> glab mr view <iid> --repo <other-project> --output json \
   | jq '{iid, title, state, draft, web_url, author: .author.username}'
 ```
 
 ### Fetch another issue's brief metadata
 
 ```bash
-GITLAB_HOST=<host> glab issue view <id> -R <other-project> --output json \
+GITLAB_HOST=<host> glab issue view <id> --repo <other-project> --output json \
   | jq '{iid, title, state, web_url, author: .author.username, labels}'
 ```
 
@@ -1034,7 +1034,7 @@ glab api --hostname <host> projects/<project-enc>/merge_requests/<iid>
 - `glab issue view` accepts a full URL argument, which can simplify resolution:
   `glab issue view https://<host>/<project>/-/issues/<id>` — glab parses the
   URL and derives host/project automatically. Still safer to pass
-  `GITLAB_HOST` + `-R` explicitly in scripts.
+  `GITLAB_HOST` + `--repo` explicitly in scripts.
 - On private projects, the reviewer's token may not have access to the
   referenced project — handle 404/403 gracefully and just surface the
   reference as-is.
@@ -1060,7 +1060,7 @@ MR state flags to inspect (all from `glab mr view --output json`):
 ### Draft detection — recommended
 
 ```bash
-glab mr view <iid> -R <project> --output json \
+glab mr view <iid> --repo <project> --output json \
   | jq -r 'if .draft then "DRAFT" else "READY" end'
 ```
 
@@ -1161,7 +1161,7 @@ many calls — a stuck server can hang the command. Wrap invocations with an
 OS-level timeout:
 
 ```bash
-timeout 30s glab mr view <iid> -R <project> --output json
+timeout 30s glab mr view <iid> --repo <project> --output json
 ```
 
 Reasonable defaults for this plugin:
@@ -1228,13 +1228,13 @@ exhausted. Combined with `--output ndjson`, memory stays bounded.
 ### Sizing requests
 
 - Default GitLab REST page size is 20, max 100. Pass
-  `-F per_page=100` on `glab api` for fewer round-trips.
+  `--field per_page=100` on `glab api` for fewer round-trips.
 - Keep `--per-page` ≤ 100; larger values are silently capped.
 
 ```bash
 glab api --hostname <host> \
   projects/<project-enc>/merge_requests/<iid>/discussions \
-  -F per_page=100 --paginate --output ndjson
+  --field per_page=100 --paginate --output ndjson
 ```
 
 ### Gotchas
@@ -1292,14 +1292,14 @@ missing JSON support or the feature altogether. Each is marked
 
 | Need                                       | glab native          | REST fallback                                                                          |
 |--------------------------------------------|----------------------|----------------------------------------------------------------------------------------|
-| MR metadata                                | `glab mr view -F json` | `GET projects/<enc>/merge_requests/<iid>`                                            |
-| MR list                                    | `glab mr list -F json` | `GET projects/<enc>/merge_requests`                                                  |
+| MR metadata                                | `glab mr view --output json` | `GET projects/<enc>/merge_requests/<iid>`                                            |
+| MR list                                    | `glab mr list --output json` | `GET projects/<enc>/merge_requests`                                                  |
 | Per-file diff                              | —                    | `GET projects/<enc>/merge_requests/<iid>/diffs` — **fallback; required**               |
 | Commits                                    | —                    | `GET projects/<enc>/merge_requests/<iid>/commits` — **fallback; required**             |
-| Discussions                                | `glab mr note list -F json` | `GET projects/<enc>/merge_requests/<iid>/discussions` — fallback; not needed   |
+| Discussions                                | `glab mr note list --output json` | `GET projects/<enc>/merge_requests/<iid>/discussions` — fallback; not needed   |
 | Related/closing issues (JSON)              | `glab mr issues` (text only) | `GET projects/<enc>/merge_requests/<iid>/closes_issues` — **fallback; required** |
 | Pipelines list for an MR                   | —                    | `GET projects/<enc>/merge_requests/<iid>/pipelines` — **fallback; required**           |
-| Approval state                             | `glab mr approvers -F json` (eligibility) | `GET projects/<enc>/merge_requests/<iid>/approvals` — **fallback; required for state** |
+| Approval state                             | `glab mr approvers --output json` (eligibility) | `GET projects/<enc>/merge_requests/<iid>/approvals` — **fallback; required for state** |
 | Approval rules breakdown (Premium+)        | —                    | `GET projects/<enc>/merge_requests/<iid>/approval_state` — **fallback; required**      |
 | Single commit diff                         | —                    | `GET projects/<enc>/repository/commits/<sha>/diff` — **fallback; required**            |
 

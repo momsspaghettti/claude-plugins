@@ -1,6 +1,6 @@
 {
   "name": "gitlab-mr-review",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Iterative, multi-agent review of GitLab Merge Requests with copy-paste-ready inline findings, regression detection across runs, and graceful integration with Jira/Slack MCPs when available",
   "author": {
     "name": "Ivan Samoilov"
