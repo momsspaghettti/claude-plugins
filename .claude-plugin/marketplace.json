@@ -11,6 +11,11 @@
       "name": "go-backend-dev",
       "source": "./plugins/go-backend-dev",
       "description": "Go backend feature development workflow with specialized agents for codebase exploration, architecture design, test strategy, and quality review"
+    },
+    {
+      "name": "gitlab-mr-review",
+      "source": "./plugins/gitlab-mr-review",
+      "description": "Iterative, multi-agent review of GitLab Merge Requests with copy-paste-ready inline findings, regression detection, and optional Jira/Slack context integration"
     }
   ]
 }
